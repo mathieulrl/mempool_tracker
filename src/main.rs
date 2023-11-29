@@ -1,10 +1,11 @@
 use reqwest::header;
 use hex;
+use tokio::time::interval;
 
 static APP_USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
 
 fn get_client() -> reqwest::Client {
-    let mut headers = header::HeaderMap::new();
+    let headers = header::HeaderMap::new();
 
     let client = reqwest::Client::builder()
         .default_headers(headers)
@@ -15,9 +16,16 @@ fn get_client() -> reqwest::Client {
     client
 }
 
+struct interestingTx {
+    txid: String,
+    fees: u64,
+}
 
 #[tokio::main]
 async fn main() {
+
+    let mut tab_interesting_tx=Vec::new();
+
     let txids_url = "https://mempool.space/testnet/api/mempool/txids";
 
     let client = get_client();
@@ -26,9 +34,10 @@ async fn main() {
     if txids_response.status().is_success() {
         let txids = txids_response.json::<Vec<String>>().await.unwrap();
 
-        for i in 0..5 {
-            let txid = &txids[i];
-            let tx_url = format!("https://mempool.space/testnet/api/tx/{}", txid);
+        //while après
+        for txid in &txids {
+            //let txid = &txids[i];
+            let tx_url = format!("https://mempool.space/testnet/api/tx/{}", &txid);
         
             let tx_response = client.get(&tx_url).send().await.unwrap();
             if tx_response.status().is_success() {
@@ -39,15 +48,35 @@ async fn main() {
                     let scriptsig = input["scriptsig"].as_str().unwrap_or("");
                     let witness = input["witness"].as_array().map(|arr| arr.to_vec()).unwrap_or_else(Vec::new);
                     
-                    for witness_value in &witness {
+                    let first_witness = &witness.first();
+                    let mut decoded_witness = Vec::new();
+
+                    //I print the decoded witness here
+                    for witness_value in first_witness {
                         if let Some(witness_str) = witness_value.as_str() {
-                            let decoded_witness = hex::decode(witness_str).expect("Failed to decode witness");
-                            println!("{:?}", decoded_witness);
+                            decoded_witness = hex::decode(witness_str).expect("Failed to decode witness");
+                            //println!("decoded witness: {:?}", &decoded_witness);
                         }
                     }
+                    
+                    println!("txid: {}", &txid);
 
-                    println!("scriptsig: {:?}", scriptsig);
-                    println!("witness: {:?}", witness);
+                        if let Some(last_value) = decoded_witness.last() {
+                            if last_value == &130 {
+                                println!("La dernière valeur du premier vecteur de witness est différente de 1 : {}", last_value);
+                                tab_interesting_tx.push(interestingTx{txid: txid.to_string(), fees: tx_json["fee"].as_u64().unwrap()});
+                                
+                            } //else {
+                                //println!("La dernière valeur du premier vecteur de witness est égale à 1.");
+                           // }
+                        } //else {
+                            //println!("Le premier vecteur de witness est vide.");
+                      //  }
+                        
+
+                    //I print the scriptsig and witness here
+                   // println!("scriptsig: {:?}", scriptsig);
+                    //println!("witness: {:?}", witness);
                     
                 }
             } else {
