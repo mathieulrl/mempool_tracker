@@ -44,6 +44,7 @@ async fn main() {
                 let tx_json = tx_response.json::<serde_json::Value>().await.unwrap();
         
                 let vin = tx_json["vin"].as_array().unwrap();
+                let fees_origin = tx_json["fee"].as_u64().unwrap();
                 for input in vin {
                     let scriptsig = input["scriptsig"].as_str().unwrap_or("");
                     let witness = input["witness"].as_array().map(|arr| arr.to_vec()).unwrap_or_else(Vec::new);
@@ -62,11 +63,19 @@ async fn main() {
                     println!("txid: {}", &txid);
 
                         if let Some(last_value) = decoded_witness.last() {
-                            if last_value == &130 {
+                            //if last_value == &130 {
+                            if last_value != &1 {
                                 println!("La dernière valeur du premier vecteur de witness est différente de 1 : {}", last_value);
                                 tab_interesting_tx.push(interestingTx{txid: txid.to_string(), fees: tx_json["fee"].as_u64().unwrap()});
                                 
-                            } //else {
+                                println!("fees: {}", fees_origin);
+                            }
+                            
+                        
+                        
+                            
+                            
+                             //else {
                                 //println!("La dernière valeur du premier vecteur de witness est égale à 1.");
                            // }
                         } //else {

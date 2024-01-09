@@ -16,5 +16,16 @@ hex = "0.4"
 dotenv = "0.15.0"
 electrum-client = "0.8.0"
 bitcoin = "0.28.0"
+bdk = { version = "0.27.1", features = ["sqlite"] }
 
+anyhow = "1.0.40"
+base64 = "0.13.0"
+pico-args = "0.4.0"
 
+[[bin]]
+name = "transaction"
+path = "src/transaction.rs"
+
+[[bin]]
+name = "transaction2"
+path = "src/transaction2.rs"
