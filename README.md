@@ -35,7 +35,7 @@ To verify the effectiveness of our code in identifying transactions with anomali
 
 On the Testnet, there is less activity compared to the real Bitcoin network. Therefore, finding interesting transactions can be challenging. By creating a fake transaction with anomalies, we can effectively test and evaluate our code in a controlled environment.
 
-### Difficulties encountered :bug:
+### Difficulties encountered 🚧
 
    - The literature about our project is limited and hard to find and above all in Rust
    - The issues about descriptors was more complicated as expected. We struggle to convert our private/puclic keys into a descriptor for the transaction
