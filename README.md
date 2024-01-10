@@ -2,7 +2,7 @@
 
 **School Project:** Bitcoin Mempool Tracking of Anomalies in Transaction Scripts
 
-## Project Overview
+## Project Overview 📋
 
 The goal of this project is to:
 
@@ -14,7 +14,7 @@ The goal of this project is to:
 
 3. Convert the P2WPKH format provided by Electrum (when requesting the private key) into the WPKH format required in the `transaction2.rs` code.
 
-## Project Execution
+## Project Execution :chart_with_upwards_trend:
 
 To verify the effectiveness of our code in identifying transactions with anomalies, we will follow these steps:
 
@@ -35,7 +35,7 @@ To verify the effectiveness of our code in identifying transactions with anomali
 
 On the Testnet, there is less activity compared to the real Bitcoin network. Therefore, finding interesting transactions can be challenging. By creating a fake transaction with anomalies, we can effectively test and evaluate our code in a controlled environment.
 
-### Difficulties encountered
+### Difficulties encountered :bug:
 
    - The literature about our project is limited and hard to find and above all in Rust
    - The issues about descriptors was more complicated as expected. We struggle to convert our private/puclic keys into a descriptor for the transaction
