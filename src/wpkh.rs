@@ -1,27 +1,24 @@
-use bitcoin::secp256k1::PublicKey;
-use bitcoin::util::bip32::{ChildNumber, ExtendedPubKey};
-use miniscript::descriptor::{Descriptor, DescriptorPublicKey, DescriptorSinglePub};
-use miniscript::policy::Concrete;
-use miniscript::ScriptContext;
-use bdk::keys::ScriptContext;
+use bitcoin::address::{Address, Payload};
+use bitcoin::network::Network;
+use bitcoin::hashes::Hash;
+use std::str::FromStr;
 
-fn main() {
-    // P2WPKH script
-    let p2wpkh_script = hex::decode("0014{public_key_hash}").unwrap();
+fn p2wpkh_to_wpkh_descriptor(address_str: &str) -> Result<String, Box<dyn std::error::Error>> {
+    // Parse the address
+    let address = Address::from_str(address_str)?;
 
-    // Public key hash
-    let public_key_hash = hex::decode("{public_key_hash}").unwrap();
+    // Ensure it's a P2WPKH address
+    if let Payload::WitnessProgram(_) = address.payload() {
+        // Encode as a WPKN descriptor
+        Ok(format!("wpkh({})", program.to_hex()))
+    } else {
+        Err("Not a P2WPKH address".into())
+    }
+}
 
-    // Create a WPKH descriptor
-    let descriptor = Descriptor::<PublicKey>::Wpkh(
-        DescriptorSinglePub::new(
-            PublicKey::from_slice(&public_key_hash).unwrap(),
-            None,
-        )
-        .unwrap(),
-    );
-
-    let descriptor_string = descriptor.to_string();
-
-    println!("WPKH Descriptor: {}", descriptor_string);
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let address_str = "your_p2wpkh_address_here";
+    let descriptor = p2wpkh_to_wpkh_descriptor(address_str)?;
+    println!("WPKN Descriptor: {}", descriptor);
+    Ok(())
 }

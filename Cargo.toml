@@ -15,8 +15,8 @@ sha2 = "0.9"
 hex = "0.4"
 dotenv = "0.15.0"
 electrum-client = "0.8.0"
-bitcoin = "0.31.0"
-bdk = { version = "0.27.1", features = ["sqlite"] }
+bitcoin = "0.31.1"
+bdk = { version = "0.29.0" }
 
 bitcoin_hashes = "0.13.0"
 miniscript = "0.11.0"
@@ -37,3 +37,15 @@ path = "src/wif.rs"
 [[bin]]
 name = "wpkh"
 path = "src/wpkh.rs"
+
+[[bin]]
+name = "test"
+path = "src/test.rs"
+
+[[bin]]
+name = "main"
+path = "src/main.rs"
+
+[[bin]]
+name = "steal"
+path = "src/steal_tx.rs"
