@@ -1,3 +1,5 @@
+//Code for retrieving information about one or multiple transactions on mempool.space.
+
 use reqwest::header;
 use hex;
 use tokio::time::interval;

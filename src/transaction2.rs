@@ -1,3 +1,5 @@
+// Création d'une transaction de toute pièce en utilisant le wallet bitcoin Electrum
+
 #![allow(unused)]
 use bdk::blockchain::Blockchain;
 use bdk::bitcoin::Address;
