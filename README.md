@@ -41,25 +41,25 @@ On the Testnet, there is less activity compared to the real Bitcoin network. The
    - The issues about descriptors was more complicated as expected. We struggle to convert our private/puclic keys into a descriptor for the transaction
 ---
 
-### Description of the project elements 🔍
+# Description of the project elements 🔍
 
 ## main
 
 This Rust code retrieves information about transactions from the testnet mempool.space API, focusing on transactions with specific criteria.
 
-# HTTP Client Setup
+### HTTP Client Setup
 
 The `get_client` function initializes a reqwest HTTP client with default headers and a user agent.
 
-# Data Structure
+### Data Structure
 
 The `interestingTx` struct defines a structure to store information about transactions deemed interesting, specifically the transaction ID (`txid`) and fees.
 
-# Main Function
+### Main Function
 
 A vector `tab_interesting_tx` is created to store instances of interesting transactions.
 
-# Transaction Retrieval
+###s Transaction Retrieval
 
 - The program makes an HTTP GET request to the mempool.space testnet API to retrieve a list of transaction IDs (`txids`).
 - For each transaction ID, it constructs a URL to fetch detailed transaction information.
