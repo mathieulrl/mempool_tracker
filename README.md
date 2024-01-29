@@ -79,3 +79,7 @@ This code handles the conversion of a Bitcoin private key to its corresponding W
 ## wpkh
 
 This code converts a Pay-to-Witness-Public-Key-Hash (P2WPKH) Bitcoin address to its corresponding Witness Public Key Hash (WPKH) descriptor. The main function initializes an address, calls the conversion function, and prints the resulting WPKH descriptor. 
+
+## steal_tx
+
+This code attempts to recreate a specific transaction found by the tracker with higher fees. It creates a new Bitcoin transaction on the Testnet using the Electrum wallet, generating a new wallet, obtaining an address, and building a transaction with increased fees compared to a previously tracked transaction. The finalized transaction is then signed and broadcasted to the Bitcoin Testnet. It's important to note that, as of the current implementation, there are challenges in successfully completing the code, and it hasn't been brought to completion or functional status.
