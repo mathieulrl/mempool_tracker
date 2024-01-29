@@ -1,24 +1,60 @@
-use bitcoin::address::{Address, Payload};
-use bitcoin::network::Network;
-use bitcoin::hashes::Hash;
-use std::str::FromStr;
+// The purpose of this code is to convert the P2WPKH format provided by Electrum (when requesting the private key) into the WPKH format required in the transaction2.rs code.
 
-fn p2wpkh_to_wpkh_descriptor(address_str: &str) -> Result<String, Box<dyn std::error::Error>> {
-    // Parse the address
-    let address = Address::from_str(address_str)?;
+use bitcoin::secp256k1::PublicKey;
+use bitcoin::util::bip32::{ChildNumber, ExtendedPubKey};
+use miniscript::descriptor::{Descriptor, DescriptorPublicKey, DescriptorSinglePub};
+use miniscript::policy::Concrete;
+use miniscript::ScriptContext;
+use bdk::keys::ScriptContext;
 
-    // Ensure it's a P2WPKH address
-    if let Payload::WitnessProgram(_) = address.payload() {
-        // Encode as a WPKN descriptor
-        Ok(format!("wpkh({})", program.to_hex()))
-    } else {
-        Err("Not a P2WPKH address".into())
-    }
+fn main() {
+    // P2WPKH script
+    let p2wpkh_script = hex::decode("0014{public_key_hash}").unwrap();
+
+    // Public key hash
+    let public_key_hash = hex::decode("{public_key_hash}").unwrap();
+
+    // Create a WPKH descriptor
+    let descriptor = Descriptor::<PublicKey>::Wpkh(
+        DescriptorSinglePub::new(
+            PublicKey::from_slice(&public_key_hash).unwrap(),
+            None,
+        )
+        .unwrap(),
+    );
+
+    let descriptor_string = descriptor.to_string();
+
+    println!("WPKH Descriptor: {}", descriptor_string);
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let address_str = "your_p2wpkh_address_here";
-    let descriptor = p2wpkh_to_wpkh_descriptor(address_str)?;
-    println!("WPKN Descriptor: {}", descriptor);
-    Ok(())
+
+use bitcoin::secp256k1::PublicKey;
+use bitcoin::util::bip32::{ChildNumber, ExtendedPubKey};
+use miniscript::descriptor::{Descriptor, DescriptorPublicKey, DescriptorSinglePub};
+use miniscript::ScriptContext;
+
+fn main() {
+    
+    let public_key_hash = hex::decode("PUBLIC_KEY_HASH").unwrap();
+
+    // Creation of script P2WPKH
+    let p2wpkh_script = hex::decode(format!("0014{:x}", public_key_hash.len()))
+        .unwrap()
+        .into_iter()
+        .chain(public_key_hash.into_iter())
+        .collect::<Vec<_>>();
+
+    // Creation of descriptor WPKH
+    let descriptor = Descriptor::<PublicKey>::Wpkh(
+        DescriptorSinglePub::new(
+            PublicKey::from_slice(&public_key_hash).unwrap(),
+            None,
+        )
+        .unwrap(),
+    );
+
+    //Printing the descriptor
+    let descriptor_string = format!("{}", descriptor);
+    println!("WPKH Descriptor: {}", descriptor_string);
 }

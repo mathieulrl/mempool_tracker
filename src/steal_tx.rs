@@ -1,23 +1,23 @@
 #![allow(unused)]
-use bdk::blockchain::Blockchain;
-use bdk::bitcoin::Address;
-use std::str::FromStr;
-use bdk::SignOptions;
-use bdk::SyncOptions;
 use bdk::{
-    blockchain::ElectrumBlockchain,
+    bitcoin::{self, Address, Network, Transaction},
     electrum_client::Client,
-    descriptor,
+    wallet::{AddressIndex, SyncOptions, Wallet},
+    blockchain::ElectrumBlockchain,
+    database::MemoryDatabase,
 };
+use bdk::bitcoin::Txid;
+use std::str::FromStr;
+use bdk::blockchain::Blockchain;
+use bdk::SignOptions;
 use bdk::template::P2Wpkh;
-use bdk::wallet::AddressIndex::New;
-use bdk::{Wallet, bitcoin, bitcoin::Network, database::MemoryDatabase};
-use bdk::wallet::AddressIndex;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new("ssl://electrum.blockstream.info:60002")?;
+    let blockchain = ElectrumBlockchain::from(client);
 
     let key =
-    bitcoin::PrivateKey::from_wif("")?;
+    bitcoin::PrivateKey::from_wif("cN89wfqNvFB8vRCMgmtKXwz24AyDxrtp6PDBLBKW1CqXWmxwMoe8")?;
     let wallet = Wallet::new(
         P2Wpkh(key),
         None,
@@ -25,65 +25,51 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         MemoryDatabase::default(),
     )?;
     
-//     let external_key =
-//     bitcoin::PrivateKey::from_wif("cVFnr9ZQzXVrEKRBoEzJ97HfzjrKJCStLN2Q3eAquY33ndpsbCZ1")?;
-//     let (external_descriptor, key_map_1, networks_1) = bdk::descriptor!(wpkh(external_key))?;
 
-//     let internal_key =
-//     bitcoin::PrivateKey::from_wif("cVaAjQfVNjRVUp9CPZfYhSMhJKyaCfEzZ9esx8NtrFBt3vgWKuHD")?;
-//     let (internal_descriptor, key_map_2, networks_2) = bdk::descriptor!(wpkh(internal_key))?;
-
-
-// //    let external_descriptor = "wpkh(tprv8ZgxMBicQKsPdy6LMhUtFHAgpocR8GC6QmwMSFpZs7h6Eziw3SpThFfczTDh5rW2krkqffa11UpX3XkeTTB2FvzZKWXqPY54Y6Rq4AQ5R8L/84'/0'/0'/0/*)";
-// //    let internal_descriptor = "wpkh(tprv8ZgxMBicQKsPdy6LMhUtFHAgpocR8GC6QmwMSFpZs7h6Eziw3SpThFfczTDh5rW2krkqffa11UpX3XkeTTB2FvzZKWXqPY54Y6Rq4AQ5R8L/84'/0'/0'/1/*)";
-
-//     let wallet: Wallet<MemoryDatabase> = Wallet::new(
-//         external_descriptor,
-//         Some(internal_descriptor),
-//         Network::Testnet,
-//         MemoryDatabase::new(),
-//     )?;
-//     // ...   
-
-    
-
-    let address = wallet.get_address(AddressIndex::New)?;
-    println!("Generated Address: {}", address);
-
-    let client = Client::new("ssl://electrum.blockstream.info:60002")?;
-    let blockchain = ElectrumBlockchain::from(client);
-
+    // Synchroniser le portefeuille avec la blockchain
     wallet.sync(&blockchain, SyncOptions::default())?;
 
-    let balance = wallet.get_balance()?;
-    println!("Wallet balance in SAT: {}", balance);
-    let faucet_address = Address::from_str("tb1qlwjhp2nlf8tuk9n574rm0f7q2qjwpfa0jdpfu4")?;
+    // Remplacer le txid ci-dessous par celui de la transaction à surenchérir
+    let existing_txid = bitcoin::Txid::from_str("d7363317230d4e2e93954ab8d1d570ba2e8145d392cce6cf6b88f9f6255818f3")?;
+    let existing_transaction = wallet.get_tx(&existing_txid, true)?.expect("Transaction not found");
+    
 
-    // create a transaction
+
+
+    // Calculer le nouveau montant de fee (par exemple, 2000 satoshis de plus que l'original)
+    let new_fee_amount = match existing_transaction.fee {
+        Some(value) => value + 2000,
+        None => {
+            // Si la transaction n'a pas de frais, nous devons en ajouter
+            2000
+        }
+    };
+
+
+    // Créer une nouvelle transaction en surenchérissant l'originale
     let mut tx_builder = wallet.build_tx();
     tx_builder
+        .drain_wallet()  // Ajoute toutes les UTXO du portefeuille
         .add_recipient(
-            faucet_address.payload.script_pubkey(),
-            1000,
+            Address::from_str("tb1qdqxq4lfq0kqdrt8vzcmtkse9lv9edd85c4q3qj")?.payload.script_pubkey(),
+            new_fee_amount,
         )
         .enable_rbf();
+
     let (mut psbt, tx_details) = tx_builder.finish()?;
 
-    println!("Transaction details: {:#?}", tx_details);
+    // Signer la nouvelle transaction
+    wallet.sign(&mut psbt, SignOptions::default())?;
 
-
-    let finalized = wallet.sign(&mut psbt,SignOptions::default())?;
-    assert!(finalized,"Tx has not been finalized");
-    println!("Transaction Signed: {}", finalized);
-
-    // broadcast the transaction
+    // Broadcast de la nouvelle transaction
     let raw_transaction = psbt.extract_tx();
     let txid = raw_transaction.txid();
     blockchain.broadcast(&raw_transaction)?;
+
     println!(
-    "Transaction sent! TXID: {txid}.\nExplorer URL: https://blockstream.info/testnet/tx/{txid}",
-    txid = txid
-);
+        "Transaction sent! TXID: {txid}.\nExplorer URL: https://blockstream.info/testnet/tx/{txid}",
+        txid = txid
+    );
 
     Ok(())
 }

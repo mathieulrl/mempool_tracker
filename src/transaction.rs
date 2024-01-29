@@ -1,3 +1,5 @@
+// Création d'une transaction normale de toute pièce en utilisant le wallet bitcoin Electrum
+
 #![allow(unused)]
 use bdk::blockchain::Blockchain;
 use bdk::bitcoin::Address;
@@ -24,28 +26,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Network::Testnet,
         MemoryDatabase::default(),
     )?;
-    
-//     let external_key =
-//     bitcoin::PrivateKey::from_wif("cVFnr9ZQzXVrEKRBoEzJ97HfzjrKJCStLN2Q3eAquY33ndpsbCZ1")?;
-//     let (external_descriptor, key_map_1, networks_1) = bdk::descriptor!(wpkh(external_key))?;
-
-//     let internal_key =
-//     bitcoin::PrivateKey::from_wif("cVaAjQfVNjRVUp9CPZfYhSMhJKyaCfEzZ9esx8NtrFBt3vgWKuHD")?;
-//     let (internal_descriptor, key_map_2, networks_2) = bdk::descriptor!(wpkh(internal_key))?;
-
-
-// //    let external_descriptor = "wpkh(tprv8ZgxMBicQKsPdy6LMhUtFHAgpocR8GC6QmwMSFpZs7h6Eziw3SpThFfczTDh5rW2krkqffa11UpX3XkeTTB2FvzZKWXqPY54Y6Rq4AQ5R8L/84'/0'/0'/0/*)";
-// //    let internal_descriptor = "wpkh(tprv8ZgxMBicQKsPdy6LMhUtFHAgpocR8GC6QmwMSFpZs7h6Eziw3SpThFfczTDh5rW2krkqffa11UpX3XkeTTB2FvzZKWXqPY54Y6Rq4AQ5R8L/84'/0'/0'/1/*)";
-
-//     let wallet: Wallet<MemoryDatabase> = Wallet::new(
-//         external_descriptor,
-//         Some(internal_descriptor),
-//         Network::Testnet,
-//         MemoryDatabase::new(),
-//     )?;
-//     // ...   
-
-    
+        
 
     let address = wallet.get_address(AddressIndex::New)?;
     println!("Generated Address: {}", address);

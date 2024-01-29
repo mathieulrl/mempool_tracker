@@ -1,4 +1,4 @@
-// Création d'une transaction de toute pièce en utilisant le wallet bitcoin Electrum
+// Création d'une transaction Anyone Can Spend de toute pièce en utilisant le wallet bitcoin Electrum
 
 #![allow(unused)]
 use bdk::blockchain::Blockchain;
@@ -26,34 +26,13 @@ use bitcoin::opcodes::OP_TRUE;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let key =
-    bitcoin::PrivateKey::from_wif("")?;
+    bitcoin::PrivateKey::from_wif("cN89wfqNvFB8vRCMgmtKXwz24AyDxrtp6PDBLBKW1CqXWmxwMoe8")?;
     let wallet = Wallet::new(
         P2Wpkh(key),
         None,
         Network::Testnet,
         MemoryDatabase::default(),
     )?;
-    
-//     let external_key =
-//     bitcoin::PrivateKey::from_wif("cVFnr9ZQzXVrEKRBoEzJ97HfzjrKJCStLN2Q3eAquY33ndpsbCZ1")?;
-//     let (external_descriptor, key_map_1, networks_1) = bdk::descriptor!(wpkh(external_key))?;
-
-//     let internal_key =
-//     bitcoin::PrivateKey::from_wif("cVaAjQfVNjRVUp9CPZfYhSMhJKyaCfEzZ9esx8NtrFBt3vgWKuHD")?;
-//     let (internal_descriptor, key_map_2, networks_2) = bdk::descriptor!(wpkh(internal_key))?;
-
-
-// //    let external_descriptor = "wpkh(tprv8ZgxMBicQKsPdy6LMhUtFHAgpocR8GC6QmwMSFpZs7h6Eziw3SpThFfczTDh5rW2krkqffa11UpX3XkeTTB2FvzZKWXqPY54Y6Rq4AQ5R8L/84'/0'/0'/0/*)";
-// //    let internal_descriptor = "wpkh(tprv8ZgxMBicQKsPdy6LMhUtFHAgpocR8GC6QmwMSFpZs7h6Eziw3SpThFfczTDh5rW2krkqffa11UpX3XkeTTB2FvzZKWXqPY54Y6Rq4AQ5R8L/84'/0'/0'/1/*)";
-
-//     let wallet: Wallet<MemoryDatabase> = Wallet::new(
-//         external_descriptor,
-//         Some(internal_descriptor),
-//         Network::Testnet,
-//         MemoryDatabase::new(),
-//     )?;
-//     // ...   
-
     
 
     let address = wallet.get_address(AddressIndex::New)?;
@@ -80,16 +59,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Transaction details: {:#?}", tx_details);
 
-    // Modify the 2 first hex digits of the script pubkey of the output
-    let output_index = 1; // Index of the output you want to modify
+    // Here, I try to modify the 2 first hex digits of the script pubkey of the output
+    let output_index = 1; // Index of the output I want to modify
     let mut script_pubkey = psbt.unsigned_tx.output[output_index].script_pubkey.clone();
     let mut script_pubkey_bytes = script_pubkey.into_bytes();
 
-    // Modify the first two hex digits
+    // Modification of the first two hex digits
     script_pubkey_bytes[0] = 0x51;
 
 
-    // Set the new script pubkey
+    // Then I set the new script pubkey
     let new_script_pubkey = Script::from_bytes(&script_pubkey_bytes);
     psbt.unsigned_tx.output[output_index].script_pubkey = new_script_pubkey.into();
 
