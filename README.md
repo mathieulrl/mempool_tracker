@@ -68,9 +68,13 @@ A vector `tab_interesting_tx` is created to store instances of interesting trans
 - If the last value of the first witness vector is not 1, it considers the transaction interesting and adds it to `tab_interesting_tx`.
 - It prints relevant information, including the transaction ID and fees.
 
+## transaction
+
+This is code, that we first try to just build a "Normal" transaction from scratch.
+
 ## transaction2
 
-This Rust code creates a Bitcoin transaction from scratch using the Electrum wallet. The program generates a new wallet, obtains a new address, and then builds a transaction to send funds to a specified address. Additionally, it modifies the script pubkey of one of the transaction outputs for demonstration purposes. The transaction is signed, finalized, and broadcasted to the Bitcoin testnet.
+This Rust code creates a Bitcoin transaction from scratch using the Electrum wallet. The program generates a new wallet, obtains a new address, and then builds a transaction "AnyoneCanSpend" to send funds to a specified address. Additionally, it modifies the script pubkey of one of the transaction outputs for demonstration purposes. The transaction is signed, finalized, and broadcasted to the Bitcoin testnet.
 
 ## wif
 
